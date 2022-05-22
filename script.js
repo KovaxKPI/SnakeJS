@@ -96,5 +96,8 @@ function getRandomInt(min, max) {
       snake.dy = grid;
       snake.dx = 0;
     }
+    else if(e.which === 27){
+        alert("Paused");
+    }
   });
   requestAnimationFrame(loop);
