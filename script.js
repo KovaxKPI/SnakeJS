@@ -2,23 +2,27 @@ var canvas = document.getElementById('game');
 var context = canvas.getContext('2d');
 var grid = 16;
 var count = 0;
+var score = 0;
+var paused = false;
 var snake = {
   x: 160,
   y: 160,
   dx: grid,
   dy: 0,
   cells: [],
-  maxCells: 4
+  minCells: 4
 };
 var apple = {
   x: 320,
   y: 320
 };
+var scoreDisplayElem = document.querySelector('.scoreboard');
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
   function loop() {
     requestAnimationFrame(loop);
+    if (paused) throwError();
     if (++count < 4) {
       return;
     }
@@ -28,11 +32,11 @@ function getRandomInt(min, max) {
     snake.y += snake.dy;
     //With borders
     if (snake.x < 0 || snake.x >= canvas.width || snake.y < 0 || snake.y >= canvas.height) {
-        alert("Game over!");
+        alert("Game !");
         snake.x = 160;
         snake.y = 160;
         snake.cells = [];
-        snake.maxCells = 4;
+        snake.minCells = 4;
         snake.dx = grid;
         snake.dy = 0;
         apple.x = getRandomInt(0, 25) * grid;
@@ -52,7 +56,7 @@ function getRandomInt(min, max) {
         snake.y = 0;
       }*/
     snake.cells.unshift({ x: snake.x, y: snake.y });
-    if (snake.cells.length > snake.maxCells) {
+    if (snake.cells.length > snake.minCells) {
       snake.cells.pop();
     }
     context.fillStyle = 'red';
@@ -61,24 +65,28 @@ function getRandomInt(min, max) {
     snake.cells.forEach(function (cell, index) {
       context.fillRect(cell.x, cell.y, grid - 1, grid - 1);
       if (cell.x === apple.x && cell.y === apple.y) {
-        snake.maxCells++;
+        snake.minCells++;
+        score += 10;
+        scoreDisplayElem.innerHTML = score;
         apple.x = getRandomInt(0, 25) * grid;
         apple.y = getRandomInt(0, 25) * grid;
       }
       for (var i = index + 1; i < snake.cells.length; i++) {
         if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-          snake.x = 160;
-          snake.y = 160;
-          snake.cells = [];
-          snake.maxCells = 4;
-          snake.dx = grid;
-          snake.dy = 0;
-          apple.x = getRandomInt(0, 25) * grid;
-          apple.y = getRandomInt(0, 25) * grid;
+            alert("Game over!");
+            snake.x = 160;
+            snake.y = 160;
+            snake.cells = [];
+            snake.minCells = 4;
+            snake.dx = grid;
+            snake.dy = 0;
+            apple.x = getRandomInt(0, 25) * grid;
+            apple.y = getRandomInt(0, 25) * grid;
         }
       }
     });
   }
+  
   document.addEventListener('keydown', function (e) {
     if (e.which === 37 && snake.dx === 0) {
       snake.dx = -grid;
@@ -96,8 +104,9 @@ function getRandomInt(min, max) {
       snake.dy = grid;
       snake.dx = 0;
     }
-    else if(e.which === 27){
-        alert("Paused");
+    else if(e.which == 27){
+        paused = !paused;
+        document.querySelector('.pause').innerHTML = paused ? 'Paused' : '';
     }
   });
   requestAnimationFrame(loop);
