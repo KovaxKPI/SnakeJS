@@ -1,2 +1,1 @@
 # SnakeJS
-vlada
